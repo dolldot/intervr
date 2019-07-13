@@ -1,0 +1,11 @@
+export const QUESTION = 'QUESTION';
+export const QUESTION_FULFILLED = 'QUESTION_FULFILLED';
+export const QUESTION_REJECTED = 'QUESTION_REJECTED';
+
+export const USER = 'USER';
+export const USER_FULFILLED = 'USER_FULFILLED';
+export const USER_REJECTED = 'USER_REJECTED';
+
+export const ANSWER = 'ANSWER';
+export const ANSWER_FULFILLED = 'ANSWER_FULFILLED';
+export const ANSWER_REJECTED = 'ANSWER_REJECTED';
