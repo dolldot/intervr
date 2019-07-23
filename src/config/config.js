@@ -1,5 +1,5 @@
 export const url = {
-  server: 'http://192.168.0.32:3333/api/v1/'
+  server: 'https://intervr-api.herokuapp.com/api/v1/'
 };
 
 export const color = {
