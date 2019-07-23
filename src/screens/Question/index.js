@@ -39,7 +39,7 @@ class Question extends Component {
 
     let userId = this.props.user.data.id;
     let answer = datatype == 'multi_select' ? dataItems : value;
-    let attachment = this.state.attachment;
+    let attachment = datatype == 'video' ? this.props.uri.data : this.state.attachment;
     await this.props.sendAnswer({ userId, questionId, answer, attachment });
 
     setTimeout(() => {
@@ -146,7 +146,8 @@ const mapStateToProps = state => {
   return {
     questions: state.questions,
     answer: state.answer,
-    user: state.user
+    user: state.user,
+    uri: state.uri
   };
 };
 

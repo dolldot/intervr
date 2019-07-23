@@ -7,6 +7,7 @@ import question from './question';
 import questions from './questions';
 import user from './user';
 import answer from './answer';
+import uri from './uri';
 
 const router = createNavigationReducer(RootNavigation);
 
@@ -15,7 +16,8 @@ const appReducer = combineReducers({
   question,
   questions,
   user,
-  answer
+  answer,
+  uri
 });
 
 export default appReducer;

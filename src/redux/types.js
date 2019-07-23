@@ -10,6 +10,10 @@ export const USER = 'USER';
 export const USER_FULFILLED = 'USER_FULFILLED';
 export const USER_REJECTED = 'USER_REJECTED';
 
+export const URI = 'URI';
+export const URI_FULFILLED = 'URI_FULFILLED';
+export const URI_REJECTED = 'URI_REJECTED';
+
 export const ANSWER = 'ANSWER';
 export const ANSWER_FULFILLED = 'ANSWER_FULFILLED';
 export const ANSWER_REJECTED = 'ANSWER_REJECTED';

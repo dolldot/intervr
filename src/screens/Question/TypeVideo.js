@@ -1,15 +1,47 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TextInput, ScrollView, TouchableHighlight } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TouchableHighlight
+} from 'react-native';
 import PropTypes from 'prop-types';
 import { color } from '../../config/config';
 import LinearGradient from 'react-native-linear-gradient';
 import CountDown from 'react-native-countdown-component';
 import Loader from './Loader';
+import { RNCamera } from 'react-native-camera';
+import { connect } from 'react-redux';
+import * as uri from '../../redux/actions/uri';
 
-export default class TypeVideo extends Component {
-  constructor() {
-    super();
-    this.state = {};
+const PendingView = () => (
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: 'lightgreen',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}
+  >
+    <Text>Waiting</Text>
+  </View>
+);
+
+class TypeVideo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      recordOptions: {
+        mute: false,
+        maxDuration: this.props.timer * 60,
+        quality: RNCamera.Constants.VideoQuality['720p']
+      },
+      isRecording: false,
+      recording: false,
+      processing: false
+    };
   }
 
   static propTypes = {
@@ -21,8 +53,65 @@ export default class TypeVideo extends Component {
     nextQuestion: PropTypes.func.isRequired
   };
 
+  _takeVideo = async function() {
+    if (this.camera) {
+      try {
+        const promise = this.camera.recordAsync(this.state.recordOptions);
+
+        if (promise) {
+          this.setState({ recording: true });
+          const data = await promise;
+          this.setState({ recording: false });
+          // alert(data.uri);
+          this.props.saveUri(data.uri);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  _stopRecording() {
+    this.camera.stopRecording();
+    this.setState({ recording: false });
+  }
+
   render() {
     const { loading, description, timer, number, totalQuestions, nextQuestion } = this.props;
+    const { recording, processing } = this.state;
+
+    let button = (
+      <TouchableOpacity
+        onPress={() => {
+          this._takeVideo();
+        }}
+        style={styles.capture}
+      >
+        <Text style={{ fontSize: 14 }}> RECORD </Text>
+      </TouchableOpacity>
+    );
+
+    if (recording) {
+      button = (
+        <TouchableOpacity
+          onPress={() => {
+            this._stopRecording();
+          }}
+          style={styles.capture}
+        >
+          <Text style={{ fontSize: 14 }}> STOP </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    if (processing) {
+      button = (
+        <View style={styles.capture}>
+          <ActivityIndicator animating size={18} />
+        </View>
+      );
+    }
+
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Loader loading={loading} />
@@ -48,6 +137,7 @@ export default class TypeVideo extends Component {
                 timeLabels={{ m: null, s: null }}
               />
             </View>
+
             <LinearGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -58,9 +148,33 @@ export default class TypeVideo extends Component {
                 <Text style={styles.description}>{description}</Text>
               </View>
               <View style={styles.botContent}>
-                <Text>Video goes here</Text>
+                <RNCamera
+                  ref={ref => {
+                    this.camera = ref;
+                  }}
+                  style={styles.preview}
+                  type={RNCamera.Constants.Type.front}
+                  flashMode={RNCamera.Constants.FlashMode.off}
+                  androidCameraPermissionOptions={{
+                    title: 'Permission to use camera',
+                    message: 'We need your permission to use your camera',
+                    buttonPositive: 'Ok',
+                    buttonNegative: 'Cancel'
+                  }}
+                  androidRecordAudioPermissionOptions={{
+                    title: 'Permission to use audio recording',
+                    message: 'We need your permission to use your audio',
+                    buttonPositive: 'Ok',
+                    buttonNegative: 'Cancel'
+                  }}
+                >
+                  <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                    {button}
+                  </View>
+                </RNCamera>
               </View>
             </LinearGradient>
+
             <View style={styles.footer}>
               <TouchableHighlight
                 onPress={nextQuestion}
@@ -154,7 +268,8 @@ const styles = StyleSheet.create({
   botContent: {
     flex: 3,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexDirection: 'column'
   },
   input: {
     height: 50,
@@ -180,5 +295,36 @@ const styles = StyleSheet.create({
     color: 'white',
     textTransform: 'uppercase',
     fontWeight: 'bold'
+  },
+  preview: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  capture: {
+    flex: 0,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 15,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+    margin: 20
   }
 });
+
+const mapStateToProps = state => {
+  return {
+    uri: state.uri
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    saveUri: value => dispatch(uri.uri(value))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TypeVideo);
