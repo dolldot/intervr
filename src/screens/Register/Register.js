@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableHighlight, AsyncStorage } from 'react-native';
-import { url, color } from '../../config/config';
-import axios from 'axios';
+import { Text, View, StyleSheet, TextInput, TouchableHighlight, ScrollView } from 'react-native';
 import * as user from '../../redux/actions/user';
 import { connect } from 'react-redux';
+import LinearGradient from 'react-native-linear-gradient';
 
 class Register extends Component {
   constructor() {
@@ -17,79 +16,86 @@ class Register extends Component {
 
   _nextPage = async () => {
     const { name, email, phone_number } = this.state;
-    await this.props.postData(name, email, phone_number);
-    var id = this.props.user.data.id.toString()
-    await AsyncStorage.setItem('userId', id)
-    this.props.user.isError ? alert("Tidak bisa wey") : this.props.navigation.navigate('Question')
+
+    if (name == '' && email == '' && phone_number == '') return alert('Please fill the form');
+    if (name == '') return alert('Name cannot be empty');
+    if (email == '') return alert('Email cannot be empty');
+    if (phone_number == '') return alert('Phone Number cannot be empty');
+
+    await this.props.postUser({ name, email, phone_number });
+    this.props.user.isError ? alert('Register fail') : this.props.navigation.navigate('Welcome');
+    this.setState({ name: '' });
+    this.setState({ email: '' });
+    this.setState({ phone_number: '' });
   };
 
   _pushName = text => {
-    this.setState({
-      name: text
-    });
+    this.setState({ name: text });
   };
 
   _pushEmail = text => {
-    this.setState({
-      email: text
-    });
+    this.setState({ email: text });
   };
 
   _pushNumber = text => {
-    this.setState({
-      phone_number: text
-    });
+    this.setState({ phone_number: text });
   };
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.topContent}>
-          <Text
-            style={{
-              fontWeight: 'bold',
-              justifyContent: 'center',
-              alignSelf: 'center',
-              marginBottom: 10,
-              fontSize: 20,
-              color: color.white
-            }}
-          >
-            BIODATA
-          </Text>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <LinearGradient
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          colors={['#56CCF2', '#2F80ED']}
+          style={styles.container}
+        >
+          <View style={styles.boxContent}>
+            <View style={styles.header}>
+              <Text style={styles.welcome}>JOIN THE INTERVIEW</Text>
+            </View>
+            <LinearGradient
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              colors={['#56CCF2', '#2F80ED']}
+              style={styles.content}
+            >
+              <TextInput
+                style={styles.input}
+                onChangeText={this._pushName}
+                value={this.state.name}
+                placeholder="Name"
+              />
 
-          <TextInput
-            style={styles.input}
-            onChangeText={this._pushName}
-            value={this.state.name}
-            placeholder="Name"
-          />
+              <TextInput
+                style={styles.input}
+                onChangeText={this._pushEmail}
+                value={this.state.email}
+                placeholder="Email"
+              />
 
-          <TextInput
-            style={styles.input}
-            onChangeText={this._pushEmail}
-            value={this.state.email}
-            placeholder="Email"
-          />
-
-          <TextInput
-            style={styles.input}
-            onChangeText={this._pushNumber}
-            value={this.state.phone_number}
-            placeholder="Phone Number"
-          />
-        </View>
-
-        <View style={styles.botContent}>
-          <TouchableHighlight
-            onPress={this._nextPage}
-            style={styles.button}
-            underlayColor="rgba(3, 3, 3, 0.5)"
-          >
-            <Text style={styles.buttonText}>NEXT</Text>
-          </TouchableHighlight>
-        </View>
-      </View>
+              <TextInput
+                style={styles.input}
+                onChangeText={this._pushNumber}
+                value={this.state.phone_number}
+                placeholder="Phone Number"
+                keyboardType={'number-pad'}
+              />
+            </LinearGradient>
+            <View style={styles.footer}>
+              <TouchableHighlight
+                onPress={() => {
+                  this._nextPage();
+                }}
+                style={styles.button}
+                underlayColor="#5f0059"
+              >
+                <Text style={styles.textButton}>Next</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </LinearGradient>
+      </ScrollView>
     );
   }
 }
@@ -98,38 +104,99 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
-    backgroundColor: color.primary
+    alignItems: 'center',
+    backgroundColor: '#a745d1'
+  },
+  boxContent: {
+    backgroundColor: '#5f0059',
+    borderWidth: 2,
+    borderColor: '#eee',
+    width: '90%',
+    height: '95%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  content: {
+    flex: 6,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopRightRadius: 100,
+    borderBottomLeftRadius: 100,
+    backgroundColor: '#f6c7ff',
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  footer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingRight: 20
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+    color: 'white',
+    textTransform: 'uppercase',
+    fontWeight: 'bold'
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5
   },
   topContent: {
-    flex: 8,
-    justifyContent: 'center'
+    flex: 1,
+    alignItems: 'center'
   },
   botContent: {
-    flex: 2,
-    justifyContent: 'center',
-    alignItems: 'flex-end'
+    flex: 1,
+    alignItems: 'center'
   },
   input: {
     height: 50,
-    borderColor: color.primaryDark,
+    width: '95%',
+    borderColor: '#eee',
     borderWidth: 2,
     paddingLeft: 10,
     marginBottom: 10,
-    borderRadius: 10,
-    backgroundColor: color.white
+    borderRadius: 20,
+    backgroundColor: 'transparent'
   },
   button: {
+    backgroundColor: '#a745d1',
+    padding: 15,
+    width: '30%',
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#eee',
     justifyContent: 'center',
-    backgroundColor: color.primaryDark,
-    padding: 20,
-    borderRadius: 10
+    alignItems: 'center'
   },
-  buttonText: {
-    color: color.white,
-    fontWeight: 'bold',
-    alignSelf: 'center'
+  textButton: {
+    color: 'white',
+    textTransform: 'uppercase',
+    fontWeight: 'bold'
   }
 });
 
@@ -141,7 +208,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    postData: (name, email, phone) => dispatch(user.USER(name, email, phone))
+    postUser: value => dispatch(user.user(value))
   };
 };
 

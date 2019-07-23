@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, Image, TouchableHighlight, ScrollView } from 'react-native';
-import { connect } from 'react-redux';
+import { url, color } from '../../config/config';
 import LinearGradient from 'react-native-linear-gradient';
-import * as question from '../../redux/actions/question';
 
-class Welcome extends Component {
+export default class Welcome extends Component {
   constructor() {
     super();
     this.state = {};
   }
 
   componentDidMount() {
-    this.props.getQuestions();
+    setTimeout(() => {
+      this.props.navigation.navigate('Register');
+    }, 10000);
   }
 
   render() {
@@ -25,7 +26,7 @@ class Welcome extends Component {
         >
           <View style={styles.boxContent}>
             <View style={styles.header}>
-              <Text style={styles.welcome}>Welcome to Interview</Text>
+              <Text style={styles.welcome}>Thank You</Text>
             </View>
             <LinearGradient
               start={{ x: 0, y: 0 }}
@@ -33,39 +34,12 @@ class Welcome extends Component {
               colors={['#56CCF2', '#2F80ED']}
               style={styles.content}
             >
-              <View style={styles.topContent}>
-                <Image
-                  style={{ width: 100, height: 80 }}
-                  source={require('../../assets/img/logo.png')}
-                />
-                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
-                  CODER KEDER
-                </Text>
-              </View>
-              <View style={styles.botContent}>
-                <Text style={{ color: 'white', fontSize: 17 }}>Welcome candidate,</Text>
-                <Text style={{ color: 'white', fontSize: 17, alignItems: 'center' }}>
-                  Please answer questions as best as possible, because it affects us in making
-                  decisions whether to recruit you or not.
-                </Text>
-                <Text style={{ color: 'white', fontSize: 17 }}>
-                  Number of questions is {this.props.questions.data.length}
-                </Text>
-                <Text style={{ color: 'white', fontSize: 15, marginTop: 10 }}>
-                  Press start button when you ready
-                </Text>
-              </View>
+              <Text style={{ color: 'white' }}>THANK YOU FOR YOUR PARTICIPATION</Text>
             </LinearGradient>
             <View style={styles.footer}>
-              <TouchableHighlight
-                onPress={() => {
-                  this.props.navigation.navigate('Question');
-                }}
-                style={styles.button}
-                underlayColor="#5f0059"
-              >
-                <Text style={styles.textButton}>START</Text>
-              </TouchableHighlight>
+              <Text style={{ alignItems: 'flex-end', color: 'white', fontStyle: 'italic' }}>
+                "Passion comes first, Money will follow"
+              </Text>
             </View>
           </View>
         </LinearGradient>
@@ -127,7 +101,7 @@ const styles = StyleSheet.create({
     paddingRight: 20
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 17,
     textAlign: 'center',
     margin: 10,
     color: 'white',
@@ -141,11 +115,11 @@ const styles = StyleSheet.create({
   },
   topContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: 'center'
   },
   botContent: {
-    flex: 2
+    flex: 1,
+    alignItems: 'center'
   },
   input: {
     height: 50,
@@ -166,6 +140,14 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center'
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2
+    // },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
+    // elevation: 5
   },
   textButton: {
     color: 'white',
@@ -173,20 +155,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 });
-
-const mapStateToProps = state => {
-  return {
-    questions: state.questions
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    getQuestions: () => dispatch(question.questions())
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Welcome);

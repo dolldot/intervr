@@ -3,16 +3,16 @@ import axios from 'axios';
 import * as types from '../types';
 import { url } from '../../config/config';
 
-export const USER = (name, email, phone) => {
+export const user = (value) => {
   return {
     type: types.USER,
     payload: axios({
       method: 'POST',
       url: `${url.server}user`,
       data: {
-        name: name,
-        email: email,
-        phone_number: phone
+        name: value.name,
+        email: value.email,
+        phone_number: value.phone_number
       }
     })
   };

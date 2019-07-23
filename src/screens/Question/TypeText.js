@@ -1,22 +1,40 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Image, TouchableHighlight, ScrollView } from 'react-native';
-import { connect } from 'react-redux';
+import { Text, View, StyleSheet, TextInput, ScrollView, TouchableHighlight } from 'react-native';
+import PropTypes from 'prop-types';
+import { color } from '../../config/config';
 import LinearGradient from 'react-native-linear-gradient';
-import * as question from '../../redux/actions/question';
+import CountDown from 'react-native-countdown-component';
+import Loader from './Loader';
 
-class Welcome extends Component {
+export default class TypeText extends Component {
   constructor() {
     super();
     this.state = {};
   }
 
-  componentDidMount() {
-    this.props.getQuestions();
-  }
+  static propTypes = {
+    loading: PropTypes.bool.isRequired,
+    pushText: PropTypes.func.isRequired,
+    description: PropTypes.string.isRequired,
+    timer: PropTypes.any.isRequired,
+    number: PropTypes.any.isRequired,
+    totalQuestions: PropTypes.any.isRequired,
+    nextQuestion: PropTypes.func.isRequired
+  };
 
   render() {
+    const {
+      loading,
+      pushText,
+      description,
+      timer,
+      number,
+      totalQuestions,
+      nextQuestion
+    } = this.props;
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Loader loading={loading} />
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -25,7 +43,19 @@ class Welcome extends Component {
         >
           <View style={styles.boxContent}>
             <View style={styles.header}>
-              <Text style={styles.welcome}>Welcome to Interview</Text>
+              <Text style={styles.welcome}>
+                Question {number} of {totalQuestions}
+              </Text>
+              <CountDown
+                until={timer * 60}
+                size={20}
+                style={styles.time}
+                onFinish={nextQuestion}
+                digitStyle={{ backgroundColor: '#a745d1' }}
+                digitTxtStyle={{ color: color.white }}
+                timeToShow={['M', 'S']}
+                timeLabels={{ m: null, s: null }}
+              />
             </View>
             <LinearGradient
               start={{ x: 0, y: 0 }}
@@ -34,37 +64,25 @@ class Welcome extends Component {
               style={styles.content}
             >
               <View style={styles.topContent}>
-                <Image
-                  style={{ width: 100, height: 80 }}
-                  source={require('../../assets/img/logo.png')}
-                />
-                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>
-                  CODER KEDER
-                </Text>
+                <Text style={styles.description}>{description}</Text>
               </View>
               <View style={styles.botContent}>
-                <Text style={{ color: 'white', fontSize: 17 }}>Welcome candidate,</Text>
-                <Text style={{ color: 'white', fontSize: 17, alignItems: 'center' }}>
-                  Please answer questions as best as possible, because it affects us in making
-                  decisions whether to recruit you or not.
-                </Text>
-                <Text style={{ color: 'white', fontSize: 17 }}>
-                  Number of questions is {this.props.questions.data.length}
-                </Text>
-                <Text style={{ color: 'white', fontSize: 15, marginTop: 10 }}>
-                  Press start button when you ready
-                </Text>
+                <TextInput
+                  style={{ backgroundColor: 'transparent', borderRadius: 20, width: '95%' }}
+                  onChangeText={pushText}
+                  multiline={true}
+                  numberOfLines={10}
+                  placeholder="enter answer..."
+                />
               </View>
             </LinearGradient>
             <View style={styles.footer}>
               <TouchableHighlight
-                onPress={() => {
-                  this.props.navigation.navigate('Question');
-                }}
+                onPress={nextQuestion}
                 style={styles.button}
                 underlayColor="#5f0059"
               >
-                <Text style={styles.textButton}>START</Text>
+                <Text style={styles.textButton}>Next</Text>
               </TouchableHighlight>
             </View>
           </View>
@@ -100,14 +118,12 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center'
   },
   content: {
     flex: 6,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
     borderTopRightRadius: 100,
     borderBottomLeftRadius: 100,
     backgroundColor: '#f6c7ff',
@@ -127,17 +143,23 @@ const styles = StyleSheet.create({
     paddingRight: 20
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 17,
     textAlign: 'center',
     margin: 10,
     color: 'white',
     textTransform: 'uppercase',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    flex: 3
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5
+  description: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginRight: 10
+  },
+  time: {
+    justifyContent: 'center',
+    flex: 2
   },
   topContent: {
     flex: 1,
@@ -145,7 +167,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   botContent: {
-    flex: 2
+    flex: 3,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   input: {
     height: 50,
@@ -173,20 +197,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 });
-
-const mapStateToProps = state => {
-  return {
-    questions: state.questions
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    getQuestions: () => dispatch(question.questions())
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Welcome);

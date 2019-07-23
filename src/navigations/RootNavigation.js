@@ -2,9 +2,9 @@ import { createStackNavigator, createAppContainer, createSwitchNavigator } from 
 
 import Loading from '../screens/Loading/Loading';
 import Register from '../screens/Register/Register';
-import Question from '../screens/Question/Question';
-import Show from '../screens/Question/Show';
+import Question from '../screens/Question';
 import Welcome from '../screens/Welcome/Welcome';
+import Finish from '../screens/Question/Finish';
 
 const Initial = createStackNavigator({
   Loading: {
@@ -17,30 +17,17 @@ const Initial = createStackNavigator({
 
 const App = createStackNavigator(
   {
-    Welcome: {
-      screen: Welcome,
-      navigationOptions: ({ navigation }) => ({
-        header: null
-      })
-    },
-    Register: {
-      screen: Register,
-      navigationOptions: ({ navigation }) => ({
-        header: null
-      })
-    },
-    Question: {
-      screen: Question,
-      navigationOptions: ({ navigation }) => ({
-        header: null
-      })
-    },
-    Show: {
-      screen: Show
-    }
+    Register,
+    Loading,
+    Welcome,
+    Question,
+    Finish
   },
   {
-    initialRouteName: 'Register'
+    initialRouteName: 'Register',
+    defaultNavigationOptions: ({ navigation }) => ({
+      header: null
+    })
   }
 );
 
