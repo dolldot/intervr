@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
-
+import DropdownAlert from 'react-native-dropdownalert';
 import * as question from '../../redux/actions/question';
 import * as answers from '../../redux/actions/answer';
-
-import TypeText from './TypeText';
-import TypeMultipleSelect from './TypeMultipleSelect';
-import TypeMultipleChoice from './TypeMultipleChoice';
-import TypeVideo from './TypeVideo';
+import TypeText from '../../components/Question/Text';
+import TypeSelect from '../../components/Question/Select';
+import TypeChoice from '../../components/Question/Choice';
+import TypeVideo from '../../components/Question/Video';
 
 class Question extends Component {
   constructor() {
@@ -34,13 +34,23 @@ class Question extends Component {
       });
     }
 
-    let value = this.state.value == '' ? 'null' : this.state.value;
-    let dataItems = items.length == 0 ? 'null' : items.toString();
+    if (
+      this.state.value === '' &&
+      this.state.selectedItems.length === 0 &&
+      this.props.uri.data === ''
+    ) {
+      this.dropDownAlertRef.alertWithType('error', 'Error Input Form', 'Please fill the answer');
+      this.setState({ loading: false });
+      return;
+    }
+
+    let value = this.state.value === '' ? null : this.state.value;
+    let dataItems = items.length === 0 ? null : items.toString();
 
     let userId = this.props.user.data.id;
     let answer = datatype == 'multi_select' ? dataItems : value;
     let attachment = datatype == 'video' ? this.props.uri.data : this.state.attachment;
-    await this.props.sendAnswer({ userId, questionId, answer, attachment });
+    // await this.props.sendAnswer({ userId, questionId, answer, attachment });
 
     setTimeout(() => {
       if (this.state.focus < dataLen - 1) {
@@ -68,36 +78,43 @@ class Question extends Component {
     const data = this.props.questions.data[this.state.focus];
     if (data.type == 'text') {
       return (
-        <TypeText
-          loading={this.state.loading}
-          description={data.description}
-          timer={data.timer}
-          number={data.number}
-          totalQuestions={this.props.questions.data.length}
-          pushText={this._pushText}
-          nextQuestion={() => {
-            this._nextQuestion(data.id);
-          }}
-        />
+        <View>
+          <TypeText
+            value={this.state.value}
+            loading={this.state.loading}
+            description={data.description}
+            timer={data.timer}
+            number={data.number}
+            totalQuestions={this.props.questions.data.length}
+            pushText={this._pushText}
+            nextQuestion={() => {
+              this._nextQuestion(data.id);
+            }}
+          />
+          <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        </View>
       );
     }
     if (data.type == 'multi_select') {
       let str = data.options;
       let options = str.split(',');
       return (
-        <TypeMultipleSelect
-          loading={this.state.loading}
-          description={data.description}
-          timer={data.timer}
-          number={data.number}
-          totalQuestions={this.props.questions.data.length}
-          data={options}
-          selectedItems={this.state.selectedItems}
-          onChange={this._onSelectionsChange}
-          nextQuestion={() => {
-            this._nextQuestion(data.id);
-          }}
-        />
+        <View>
+          <TypeSelect
+            loading={this.state.loading}
+            description={data.description}
+            timer={data.timer}
+            number={data.number}
+            totalQuestions={this.props.questions.data.length}
+            data={options}
+            selectedItems={this.state.selectedItems}
+            onChange={this._onSelectionsChange}
+            nextQuestion={() => {
+              this._nextQuestion(data.id);
+            }}
+          />
+          <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        </View>
       );
     }
     if (data.type == 'multiple_choice') {
@@ -109,34 +126,40 @@ class Question extends Component {
         choice.push(data);
       });
       return (
-        <TypeMultipleChoice
-          loading={this.state.loading}
-          description={data.description}
-          timer={data.timer}
-          number={data.number}
-          totalQuestions={this.props.questions.data.length}
-          data={choice}
-          onPress={value => {
-            this.setState({ value: value });
-          }}
-          nextQuestion={() => {
-            this._nextQuestion(data.id);
-          }}
-        />
+        <View>
+          <TypeChoice
+            loading={this.state.loading}
+            description={data.description}
+            timer={data.timer}
+            number={data.number}
+            totalQuestions={this.props.questions.data.length}
+            data={choice}
+            onPress={value => {
+              this.setState({ value: value });
+            }}
+            nextQuestion={() => {
+              this._nextQuestion(data.id);
+            }}
+          />
+          <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        </View>
       );
     }
     if (data.type == 'video') {
       return (
-        <TypeVideo
-          loading={this.state.loading}
-          description={data.description}
-          timer={data.timer}
-          number={data.number}
-          totalQuestions={this.props.questions.data.length}
-          nextQuestion={() => {
-            this._nextQuestion(data.id);
-          }}
-        />
+        <View>
+          <TypeVideo
+            loading={this.state.loading}
+            description={data.description}
+            timer={data.timer}
+            number={data.number}
+            totalQuestions={this.props.questions.data.length}
+            nextQuestion={() => {
+              this._nextQuestion(data.id);
+            }}
+          />
+          <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        </View>
       );
     }
   }

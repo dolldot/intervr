@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 import * as types from '../types';
-import { url } from '../../config/config';
+import { url } from '../../config';
 
-export const answer = (value) => {
+export const answer = value => {
   return {
     type: types.ANSWER,
     payload: axios({

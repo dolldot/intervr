@@ -1,14 +1,14 @@
 import { createStackNavigator, createAppContainer, createSwitchNavigator } from 'react-navigation';
 
-import Loading from '../screens/Loading/Loading';
-import Register from '../screens/Register/Register';
-import Question from '../screens/Question';
-import Welcome from '../screens/Welcome/Welcome';
-import Finish from '../screens/Question/Finish';
+import InitialScreen from '../screens/Initial';
+import RegisterScreen from '../screens/Register';
+import QuestionScreen from '../screens/Question';
+import WelcomeScreen from '../screens/Welcome';
+import FinishScreen from '../screens/Finish';
 
 const Initial = createStackNavigator({
-  Loading: {
-    screen: Loading,
+  Initial: {
+    screen: InitialScreen,
     navigationOptions: ({ navigation }) => ({
       header: null
     })
@@ -17,11 +17,10 @@ const Initial = createStackNavigator({
 
 const App = createStackNavigator(
   {
-    Register,
-    Loading,
-    Welcome,
-    Question,
-    Finish
+    Register: RegisterScreen,
+    Welcome: WelcomeScreen,
+    Question: QuestionScreen,
+    Finish: FinishScreen
   },
   {
     initialRouteName: 'Register',
@@ -34,8 +33,8 @@ const App = createStackNavigator(
 const RootNavigation = createAppContainer(
   createSwitchNavigator(
     {
-      Initial: Initial,
-      App: App
+      Initial,
+      App
     },
     {
       initialRouteName: 'Initial',

@@ -3,13 +3,12 @@ export const url = {
 };
 
 export const color = {
-  primary: '#313E4F',
-  secondary: '#3390D2',
-  primaryLight: '#B1C6DF',
+  white: '#FFFFFF',
+  primary: '#0000FF',
+  secondary: '#4A86E8',
+  primaryLight: '#65A8FF',
   secondaryLight: '#8A9CB4',
   primaryDark: '#030303',
   secondaryDark: '#3560A6',
-  other: '#778AA4',
-
-  white: '#ffffff'
+  other: '#778AA4'
 };
